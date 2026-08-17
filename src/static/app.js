@@ -30,21 +30,33 @@ document.addEventListener("DOMContentLoaded", () => {
             <ul>
               ${details.participants.length
                 ? details.participants
-                    .map(
-                      (participant) => `
+                    .map((participant) => {
+                      const escapeHtml = (value) =>
+                        String(value).replace(/[&<>"']/g, (c) => ({
+                          "&": "&amp;",
+                          "<": "&lt;",
+                          ">": "&gt;",
+                          '"': "&quot;",
+                          "'": "&#39;",
+                        }[c]));
+
+                      const safeParticipant = escapeHtml(participant);
+                      const safeName = escapeHtml(name);
+
+                      return `
                         <li>
-                          <span>${participant}</span>
+                          <span>${safeParticipant}</span>
                           <button
                             type="button"
                             class="remove-participant"
-                            data-activity="${name}"
-                            data-email="${participant}"
-                            aria-label="Unregister ${participant} from ${name}"
+                            data-activity="${safeName}"
+                            data-email="${safeParticipant}"
+                            aria-label="Unregister ${safeParticipant} from ${safeName}"
                             title="Unregister participant"
                           >&#x2715;</button>
                         </li>
-                      `
-                    )
+                      `;
+                    })
                     .join("")
                 : "<li class=\"no-participants\">No participants yet</li>"}
             </ul>
